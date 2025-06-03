@@ -1,6 +1,7 @@
+// src/hooks/use-mobile.tsx
 import * as React from "react"
 
-const MOBILE_BREAKPOINT = 768
+const MOBILE_BREAKPOINT = 1024 // Changed from 768 to 1024 for better tablet support
 
 export function useIsMobile() {
   const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined)
