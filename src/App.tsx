@@ -1,9 +1,8 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { AppProvider, useApp } from "./contexts/AppContext";
 import { OnboardingFlow } from "./pages/OnboardingFlow";
 import { Dashboard } from "./pages/Dashboard";
@@ -11,6 +10,7 @@ import { Activity } from "./pages/Activity";
 import { Leagues } from "./pages/Leagues";
 import { Settings } from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import DashboardPage from '@/pages/DashboardPage';
 
 const queryClient = new QueryClient();
 
@@ -30,8 +30,9 @@ const AppContent: React.FC = () => {
   const { user } = useApp();
 
   return (
-    <BrowserRouter>
+    <Router>
       <Routes>
+        <Route path="/" element={<DashboardPage />} />
         <Route 
           path="/" 
           element={
@@ -75,7 +76,7 @@ const AppContent: React.FC = () => {
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
-    </BrowserRouter>
+    </Router>
   );
 };
 

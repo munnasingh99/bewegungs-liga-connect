@@ -1,10 +1,9 @@
-
 import React, { useState } from 'react';
 import { Check, ChevronRight } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card } from '../ui/card';
 import { Insurer } from '../../types';
-import { mockInsurers } from '../../data/mockData';
+import { mockInsurers } from '../layout/data/mockData';
 
 interface InsurerSelectionProps {
   onInsurerSelected: (insurer: Insurer) => void;

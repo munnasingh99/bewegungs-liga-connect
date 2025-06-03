@@ -1,7 +1,6 @@
-
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { User, Insurer, ActivityData, League, Achievement } from '../types';
-import { mockUser, mockActivityData, mockInsurers, mockLeagues } from '../data/mockData';
+import { mockUser, mockActivityData, mockLeagues } from '../components/layout/data/mockData';
 
 interface AppContextType {
   user: User | null;

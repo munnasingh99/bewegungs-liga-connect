@@ -1,10 +1,37 @@
-
 // Core types for BewegungsLiga+ app
+export interface UserProfile {
+  basic_info: {
+    name: string;
+    age: number;
+    gender: string;
+    city: string;
+    occupation: string;
+  };
+  health_metrics: {
+    bmi: number;
+    fitness_level: string;
+    health_score: number;
+    resting_hr: number;
+    blood_pressure: string;
+  };
+  activity_summary: {
+    weekly_steps: number;
+    daily_avg_steps: number;
+    weekly_calories: number;
+    exercise_sessions: number;
+    workout_types: string;
+  };
+}
+
 export interface User {
   id: string;
   name: string;
   email: string;
-  insurer: Insurer | null;
+  insurer?: {
+    id: string;
+    name: string;
+    logo: string;
+  };
   hasConsented: boolean;
   isOnboarded: boolean;
   activityConnected: boolean;
@@ -15,7 +42,6 @@ export interface Insurer {
   id: string;
   name: string;
   logo: string;
-  bonusProgram: BonusProgram;
 }
 
 export interface BonusProgram {
@@ -32,23 +58,23 @@ export interface BonusProgram {
 export interface ActivityData {
   date: string;
   steps: number;
-  target: number;
+  calories: number;
+  distance: number;
+  activeMinutes: number;
 }
 
 export interface League {
   id: string;
   name: string;
   code: string;
-  members: LeagueMember[];
+  members: Array<{
+    id: string;
+    name: string;
+    totalSteps: number;
+    streak: number;
+    bonusProgress: number;
+  }>;
   createdAt: string;
-}
-
-export interface LeagueMember {
-  id: string;
-  name: string;
-  totalSteps: number;
-  streak: number;
-  bonusProgress: number;
 }
 
 export interface Achievement {
