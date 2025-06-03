@@ -1,3 +1,4 @@
+// src/components/ResponsiveDashboard.tsx
 import React from 'react';
 import Plot from 'react-plotly.js';
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -5,25 +6,24 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/use-toast";
 import { UserProfile } from '@/types';
 import { API_ENDPOINTS } from '@/lib/api-config';
-import { FaWalking, FaHeartbeat, FaBed } from 'react-icons/fa';
+import { useIsMobile } from '@/hooks/use-mobile';
 
-interface DashboardProps {
+// Import your existing mobile components
+import { StepsCard } from './dashboard/StepsCard';
+import { BonusCard } from './dashboard/BonusCard';
+import { StreakCard } from './dashboard/StreakCard';
+
+interface ResponsiveDashboardProps {
   userId: string;
 }
 
-const accentColors = {
-  steps: '#4F8EF7',
-  health: '#43D19E',
-  fitness: '#A259F7',
-  sleep: '#FFD166',
-};
-
-const Dashboard: React.FC<DashboardProps> = ({ userId }) => {
+const ResponsiveDashboard: React.FC<ResponsiveDashboardProps> = ({ userId }) => {
   const [profile, setProfile] = React.useState<UserProfile | null>(null);
   const [dashboardData, setDashboardData] = React.useState<any>(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
   const { toast } = useToast();
+  const isMobile = useIsMobile();
 
   React.useEffect(() => {
     const fetchDashboardData = async () => {
@@ -54,7 +54,7 @@ const Dashboard: React.FC<DashboardProps> = ({ userId }) => {
 
   if (loading) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-4 p-4">
         <Skeleton className="h-32 w-full" />
         <Skeleton className="h-64 w-full" />
         <Skeleton className="h-64 w-full" />
@@ -64,16 +64,79 @@ const Dashboard: React.FC<DashboardProps> = ({ userId }) => {
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[300px]">
+      <div className="flex flex-col items-center justify-center min-h-[300px] p-4">
         <div className="text-2xl font-bold text-red-600 mb-2">Error Loading Dashboard</div>
-        <div className="text-gray-600 mb-4">{error}</div>
-        <div className="text-gray-500">Please try again later or contact support if the problem persists.</div>
+        <div className="text-gray-600 mb-4 text-center">{error}</div>
+        <div className="text-gray-500 text-center">Please try again later or contact support if the problem persists.</div>
       </div>
     );
   }
 
+  // Mobile Layout
+  if (isMobile) {
+    return (
+      <div className="min-h-screen bg-gray-50 pb-20">
+        <div className="p-4 space-y-6 max-w-md mx-auto">
+          {/* Welcome message */}
+          <div className="text-center py-4">
+            <h2 className="text-xl font-semibold text-gray-900 mb-1">
+              Welcome back, {profile?.basic_info.name}! 👋
+            </h2>
+            <p className="text-gray-600">Keep up the great work with your daily activity</p>
+          </div>
+
+          {/* Main stats cards */}
+          <div className="space-y-4">
+            <StepsCard
+              todaySteps={Math.floor(profile?.activity_summary.daily_avg_steps || 0)}
+              todayTarget={8000}
+              weeklyTotal={profile?.activity_summary.weekly_steps || 0}
+            />
+
+            <div className="grid grid-cols-1 gap-4">
+              <BonusCard
+                daysAchieved={23}
+                daysRequired={20}
+                progressPercentage={100}
+                isEligible={true}
+                reward="€50 bonus payment"
+                onClaimBonus={() => toast({ title: "Bonus Claimed! 🎉" })}
+              />
+
+              <StreakCard currentStreak={7} />
+            </div>
+          </div>
+
+          {/* Simplified metrics */}
+          <Card>
+            <CardHeader>
+              <h3 className="text-lg font-semibold">Health Overview</h3>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-green-500">
+                    {profile?.health_metrics.health_score}
+                  </div>
+                  <div className="text-sm text-gray-600">Health Score</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-purple-600">
+                    {profile?.health_metrics.fitness_level}
+                  </div>
+                  <div className="text-sm text-gray-600">Fitness Level</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop Layout
   return (
-    <div className="space-y-8 p-6 max-w-4xl mx-auto">
+    <div className="space-y-8 p-6 max-w-7xl mx-auto">
       {/* User Profile Card */}
       <Card className="bg-gradient-to-r from-blue-50 to-blue-100 shadow-xl rounded-2xl border-0">
         <CardHeader className="pb-2">
@@ -85,17 +148,17 @@ const Dashboard: React.FC<DashboardProps> = ({ userId }) => {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="flex flex-col items-center bg-white p-6 rounded-xl shadow-md border border-blue-100">
-              <FaHeartbeat className="text-4xl mb-2 text-green-400" />
+              <span className="text-4xl mb-2">💚</span>
               <span className="text-md text-gray-500 font-medium">Health Score</span>
               <span className="text-5xl font-extrabold text-green-500 mt-1">{profile?.health_metrics.health_score}</span>
             </div>
             <div className="flex flex-col items-center bg-white p-6 rounded-xl shadow-md border border-blue-100">
-              <FaWalking className="text-4xl mb-2 text-blue-500" />
+              <span className="text-4xl mb-2">🏃</span>
               <span className="text-md text-gray-500 font-medium">Weekly Activity</span>
               <span className="text-3xl font-bold text-blue-600 mt-1">{profile?.activity_summary.weekly_steps.toLocaleString()} <span className="text-lg font-semibold">steps</span></span>
             </div>
             <div className="flex flex-col items-center bg-white p-6 rounded-xl shadow-md border border-blue-100">
-              <span className="text-4xl mb-2 text-purple-500">💪</span>
+              <span className="text-4xl mb-2">💪</span>
               <span className="text-md text-gray-500 font-medium">Fitness Level</span>
               <span className="text-2xl font-bold text-purple-600 mt-1">{profile?.health_metrics.fitness_level}</span>
             </div>
@@ -105,61 +168,41 @@ const Dashboard: React.FC<DashboardProps> = ({ userId }) => {
 
       {/* Dashboard Visualizations */}
       {dashboardData && (
-        <div className="grid grid-cols-1 gap-8">
-          <Card className="shadow-xl rounded-2xl border-0">
-            <CardHeader className="pb-2">
-              <h3 className="text-xl font-bold text-blue-900">Overall Fitness Dashboard</h3>
-              <p className="text-gray-500 text-sm">Visual summary of your recent health and activity</p>
-            </CardHeader>
-            <CardContent className="p-4">
-              <Plot
-                data={dashboardData.data}
-                layout={{
-                  ...dashboardData.layout,
-                  template: "plotly_white",
-                  font: {
-                    family: "Inter, sans-serif",
-                    size: 16,
-                    color: '#22223b',
-                  },
-                  paper_bgcolor: "rgba(0,0,0,0)",
-                  plot_bgcolor: "rgba(0,0,0,0)",
-                  margin: { t: 50, r: 30, b: 50, l: 30 },
-                  legend: {
-                    orientation: 'h',
-                    y: -0.2,
-                    x: 0.5,
-                    xanchor: 'center',
-                    font: { size: 14 },
-                  },
-                  xaxis: {
-                    showgrid: false,
-                    zeroline: false,
-                    linecolor: '#e0e0e0',
-                    tickfont: { size: 14 },
-                  },
-                  yaxis: {
-                    showgrid: true,
-                    gridcolor: '#f0f0f0',
-                    zeroline: false,
-                    tickfont: { size: 14 },
-                  },
-                  shapes: [
-                    // Example: add a subtle highlight or range
-                  ],
-                }}
-                config={{
-                  responsive: true,
-                  displayModeBar: false,
-                }}
-                className="w-full h-[420px] rounded-xl"
-              />
-            </CardContent>
-          </Card>
-        </div>
+        <Card className="shadow-xl rounded-2xl border-0">
+          <CardHeader className="pb-2">
+            <h3 className="text-xl font-bold text-blue-900">Detailed Analytics</h3>
+            <p className="text-gray-500 text-sm">Comprehensive view of your health and activity data</p>
+          </CardHeader>
+          <CardContent className="p-4">
+            <Plot
+              data={dashboardData.data}
+              layout={{
+                ...dashboardData.layout,
+                autosize: true,
+                responsive: true,
+                template: "plotly_white",
+                font: {
+                  family: "Inter, sans-serif",
+                  size: 14,
+                  color: '#22223b',
+                },
+                paper_bgcolor: "rgba(0,0,0,0)",
+                plot_bgcolor: "rgba(0,0,0,0)",
+                margin: { t: 60, r: 30, b: 50, l: 60 },
+              }}
+              config={{
+                responsive: true,
+                displayModeBar: false,
+              }}
+              className="w-full"
+              useResizeHandler={true}
+              style={{ width: '100%', height: '600px' }}
+            />
+          </CardContent>
+        </Card>
       )}
     </div>
   );
 };
 
-export default Dashboard; 
+export default ResponsiveDashboard;
